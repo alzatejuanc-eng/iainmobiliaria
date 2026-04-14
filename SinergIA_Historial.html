@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SinergIA · Historial de Diagnósticos</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{
+  --g:#064E3B;--gm:#059669;--gl:#A7F3D0;--gxl:#D1FAE5;
+  --v:#4C1D95;--o:#F97316;--a:#D97706;--al:#FEF3C7;
+  --r:#DC2626;--rl:#FEE2E2;--b:#1E40AF;--bl:#DBEAFE;
+  --ink:#0F172A;--mist:#64748B;--fog:#CBD5E1;
+  --paper:#F8FAFC;--card:#FFFFFF;--sl:#475569;--slat:#F1F5F9;
+  --rm:10px;--rl:16px;--rxl:24px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased;line-height:1.5}
+.shell{min-height:100vh;display:flex;flex-direction:column}
+.topbar{background:var(--g);padding:13px 28px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.tb-brand{font-family:'DM Serif Display',Georgia,serif;font-size:21px;color:#fff;letter-spacing:-.02em}
+.tb-brand span{color:#6EE7B7}
+.tb-right{display:flex;align-items:center;gap:14px}
+.tb-new{display:flex;align-items:center;gap:5px;font-size:12px;color:#6EE7B7;text-decoration:none;padding:5px 12px;border:1px solid rgba(110,231,183,.3);border-radius:100px;transition:all .2s}
+.tb-new:hover{background:rgba(110,231,183,.1)}
+.tb-sub{font-size:12px;color:rgba(255,255,255,.4)}
+.main{flex:1;max-width:880px;margin:0 auto;padding:36px 22px 56px;width:100%}
+.footer{padding:18px 28px;border-top:1px solid var(--fog);display:flex;justify-content:space-between;font-size:12px;color:var(--mist);flex-shrink:0}
+.footer strong{color:var(--g)}
+/* HIST HERO */
+.h-hero{background:var(--g);border-radius:var(--rxl);padding:34px 38px;margin-bottom:22px;color:#fff;position:relative;overflow:hidden}
+.h-hero::before{content:'';position:absolute;top:-50px;right:-50px;width:220px;height:220px;background:radial-gradient(circle,rgba(52,211,153,.12),transparent 70%);pointer-events:none}
+.hh-eye{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#6EE7B7;margin-bottom:7px}
+.hh-title{font-family:'DM Serif Display',Georgia,serif;font-size:30px;margin-bottom:7px}
+.hh-sub{font-size:14px;color:rgba(255,255,255,.57);max-width:500px;line-height:1.5}
+/* META BAR */
+.meta-bar{display:flex;align-items:center;gap:14px;margin-bottom:18px;flex-wrap:wrap}
+.meta-cnt{font-size:14px;color:var(--mist);flex:1}
+.meta-acts{display:flex;gap:8px}
+/* EVAL CARD */
+.ev-card{background:var(--card);border:1px solid var(--fog);border-radius:var(--rxl);margin-bottom:12px;overflow:hidden}
+.ev-head{display:grid;grid-template-columns:72px 1fr auto;gap:14px;align-items:center;padding:16px 20px;cursor:pointer;background:var(--paper);transition:background .15s}
+.ev-head:hover{background:#EDE9E0}
+.eh-score{text-align:center}
+.es-n{font-family:'DM Serif Display',Georgia,serif;font-size:30px;line-height:1}
+.es-l{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;margin-top:2px}
+.ei-co{font-size:16px;font-weight:600;color:var(--ink);margin-bottom:3px}
+.ei-meta{font-size:12px;color:var(--mist);line-height:1.4}
+.eh-acts{display:flex;gap:7px;align-items:center}
+.ev-toggle{font-size:18px;color:var(--mist);transition:transform .2s;cursor:pointer;background:none;border:none;padding:4px;font-family:inherit}
+.ev-card.open .ev-toggle{transform:rotate(180deg)}
+.ev-body{display:none;padding:18px 20px;border-top:1px solid var(--fog);background:#fff}
+.ev-card.open .ev-body{display:block}
+/* SCORE GRID */
+.eb-sg{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.ebs{background:var(--paper);border:1px solid var(--fog);border-radius:var(--rm);padding:10px}
+.ebs-l{font-size:11px;font-weight:500;color:var(--ink);margin-bottom:3px;line-height:1.3}
+.ebs-p{font-size:19px;font-weight:600;line-height:1;margin-bottom:3px}
+.ebs-bar{height:3px;background:var(--fog);border-radius:2px;overflow:hidden;margin-bottom:3px}
+.ebs-bf{height:100%;border-radius:2px}
+.ebs-s{font-size:10px;font-weight:500}
+/* ROADMAP */
+.eb-rm-title{font-size:12px;font-weight:600;color:var(--mist);text-transform:uppercase;letter-spacing:.1em;margin-bottom:9px}
+.eb-rm-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:14px}
+.rm-it{background:var(--paper);border:1px solid var(--fog);border-radius:var(--rm);padding:10px 12px}
+.rm-it.f{border-color:var(--g);border-width:2px}
+.rm-wk{font-size:10px;color:var(--mist);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px}
+.rm-nm{font-size:12px;font-weight:600;color:var(--ink);line-height:1.3;margin-bottom:3px}
+.rm-it.f .rm-nm{color:var(--g)}
+.rm-h{font-size:11px;font-weight:600;color:var(--g);background:var(--gxl);padding:2px 7px;border-radius:4px;display:inline-block}
+/* ANSWERS */
+.ans-btn{font-size:12px;color:var(--mist);background:none;border:1px solid var(--fog);border-radius:var(--rm);padding:6px 12px;cursor:pointer;transition:all .15s;font-family:inherit}
+.ans-btn:hover{border-color:var(--sl);color:var(--ink)}
+.ans-box{display:none;margin-top:11px;background:var(--paper);border:1px solid var(--fog);border-radius:var(--rl);padding:13px 16px;max-height:400px;overflow-y:auto}
+.ans-box.open{display:block}
+.ans-box::-webkit-scrollbar{width:4px}
+.ans-box::-webkit-scrollbar-thumb{background:var(--fog);border-radius:2px}
+.ans-sec{margin-bottom:11px}
+.ans-st{font-size:11px;font-weight:600;color:var(--mist);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px;padding-bottom:3px;border-bottom:1px solid var(--fog)}
+.ans-q{font-size:12px;color:var(--ink);margin-bottom:3px;padding-left:7px;border-left:2px solid var(--fog);line-height:1.4}
+.ans-a{font-size:12px;color:var(--g);font-weight:500;padding-left:7px;margin-bottom:7px}
+/* EMPTY */
+.empty{text-align:center;padding:60px 22px;color:var(--mist)}
+.em-icon{font-size:46px;margin-bottom:14px}
+.em-title{font-family:'DM Serif Display',Georgia,serif;font-size:23px;color:var(--ink);margin-bottom:7px}
+.em-sub{font-size:14px;line-height:1.5;margin-bottom:22px}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:9px 16px;border-radius:var(--rm);font-size:13px;font-family:inherit;font-weight:500;cursor:pointer;border:1.5px solid transparent;transition:all .15s;text-decoration:none;white-space:nowrap;line-height:1}
+.btn-primary{background:var(--g);color:#fff;border-color:var(--g)}
+.btn-primary:hover{background:#065F46}
+.btn-ghost{background:transparent;color:var(--sl);border-color:var(--fog)}
+.btn-ghost:hover{border-color:var(--sl);color:var(--ink)}
+.btn-red{background:var(--r);color:#fff;border-color:var(--r)}
+.btn-red:hover{background:#B91C1C}
+.btn-sm{font-size:12px;padding:6px 12px}
+/* TOAST */
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(14px);background:var(--g);color:#fff;padding:10px 20px;border-radius:100px;font-size:14px;font-weight:500;z-index:9999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* ANIM */
+@keyframes fu{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.anim{animation:fu .35s ease both}
+/* PRINT */
+@media print{.topbar,.footer,.meta-acts,.eh-acts,.ans-btn{display:none!important}.ev-body{display:block!important}.main{padding:0}}
+/* RESPONSIVE */
+@media(max-width:700px){
+  .eb-sg,.eb-rm-grid{grid-template-columns:1fr 1fr}
+  .ev-head{grid-template-columns:60px 1fr}
+  .eh-acts{display:none}
+  .main{padding:22px 14px 44px}
+  .h-hero{padding:24px}
+  .topbar{padding:11px 14px}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="topbar">
+    <div class="tb-brand">Sinerg<span>IA</span></div>
+    <div class="tb-right">
+      <span class="tb-sub">Historial de diagnósticos</span>
+      <a href="SinergIA_Diagnostico.html" class="tb-new">+ Nuevo diagnóstico</a>
+    </div>
+  </header>
+  <main class="main" id="main">
+    <div style="text-align:center;padding:60px 0;color:#64748B;font-size:14px">Cargando historial...</div>
+  </main>
+  <footer class="footer">
+    <div><strong>SinergIA</strong> by Human+AI · IA que multiplica, no reemplaza · 2026</div>
+    <div>Datos almacenados localmente en este navegador</div>
+  </footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// Secciones (necesario para mostrar detalle de respuestas)
+const SECTIONS=[
+  {id:'costos',label:'Control de costos',questions:[{text:'¿Cómo llevan el control del costo real versus el presupuesto por rubro de obra?',opts:['No lo llevamos activamente — solo vemos el total cuando el proyecto termina','Excel manual que alguien actualiza cada semana o quincena con los datos que llegan','Sistema que existe pero los datos del campo llegan con uno o dos semanas de retraso','Sistema actualizado en tiempo real directamente desde el campo sin intermediarios']},{text:'¿Cuándo se enteran de que un rubro específico está superando el presupuesto?',opts:['Cuando ya se gastó todo o cuando hay una deuda impaga con el proveedor','En la reunión mensual cuando el contador cierra el mes y presenta los números','Semanalmente al revisar la planilla de costos, pero el proceso toma varias horas','Recibimos una alerta automática antes de que el sobrecosto supere el umbral definido']},{text:'¿Calculan indicadores de Valor Ganado — CPI, SPI, EAC — en sus proyectos activos?',opts:['No conocemos esa metodología — nunca la hemos aplicado en nuestra empresa','La conocemos pero no la calculamos porque toma demasiado tiempo manualmente','La calculamos para algunos proyectos o solo en ciertos meses del año','Se calcula automáticamente para todos los proyectos y está visible en el dashboard']},{text:'¿Tienen visibilidad del costo final estimado (EAC) del proyecto mientras está en ejecución?',opts:['Solo cuando el proyecto está casi terminado o al cierre definitivo','Hacemos una estimación informal de vez en cuando, sin metodología consistente','Lo calculamos manualmente cada mes con los datos del sistema existente','El sistema lo actualiza automáticamente con cada reporte de avance del campo']},{text:'¿Cómo controlan las órdenes de cambio y su impacto acumulado en el presupuesto total?',opts:['No se documentan formalmente — se acuerdan verbalmente o por WhatsApp','Se registran en Excel pero no siempre se actualizan a tiempo ni se consolidan','Proceso manual con formulario establecido, pero lento y con retrasos frecuentes','Proceso digital con aprobación formalizada y actualización automática del presupuesto']}]},
+  {id:'cronograma',label:'Control de cronograma',questions:[{text:'¿Cómo gestionan el cronograma base CPM aprobado del proyecto durante la ejecución?',opts:['No hay cronograma CPM formal — o existe pero nadie lo consulta ni actualiza','Existe en Excel o MS Project pero se actualiza menos de una vez al mes','Se actualiza semanalmente por alguien del equipo técnico con datos del campo','CPM activo: camino crítico, float y dependencias recalculados automáticamente']},{text:'¿Calculan y monitorean el camino crítico y las holguras (float) de sus proyectos activos?',opts:['No usamos CPM ni calculamos camino crítico en nuestros proyectos','Identificamos la ruta crítica al inicio pero no la actualizamos durante la ejecución','Se revisa mensualmente de forma manual por el director de proyecto','El camino crítico y el float se recalculan automáticamente con cada actualización del campo']},{text:'¿Gestionan múltiples baselines (líneas base) para comparar escenarios del cronograma?',opts:['Solo tenemos una línea base inicial que nunca actualizamos durante la obra','Guardamos versiones del cronograma pero no hacemos comparación formal de varianzas','Comparamos baseline original vs actual ocasionalmente, de forma manual','Gestionamos múltiples baselines con análisis de varianza automático por actividad']},{text:'¿Cómo recibe el gerente de obra el reporte de avance físico diario desde el campo?',opts:['Llamada o WhatsApp al grupo sin ningún registro estructurado ni trazabilidad','WhatsApp al grupo pero nadie consolida la información de forma sistemática','El residente llena un parte o formulario físico o digital cada día','Bot o formulario digital que registra, estructura y consolida automáticamente en el sistema']},{text:'¿Cuándo detectan normalmente que una actividad crítica está retrasada respecto al plan?',opts:['Cuando el cliente, el banco o el contratista menciona el retraso directamente','En la reunión semanal, cuando el retraso ya tiene días y es difícil recuperar','Al comparar manualmente el parte diario con el cronograma, proceso que toma horas','Alerta automática cuando el SPI baja del umbral, con días de anticipación para reaccionar']}]},
+  {id:'lean',label:'Planificación Lean / LPS',questions:[{text:'¿Utilizan Last Planner System (LPS) u otra metodología de planificación Lean en sus obras?',opts:['No conocemos o no usamos Lean — planificamos solo con cronograma maestro','Conocemos LPS pero no lo aplicamos formalmente en campo','Aplicamos LPS parcialmente en algunas obras o fases del proyecto','Usamos LPS con tableros semanales, lookahead de 6 semanas y registro de PPC']},{text:'¿Calculan semanalmente el Porcentaje de Plan Completo (PPC) con su equipo de campo?',opts:['No calculamos PPC — no usamos esa métrica en nuestra gestión de obra','Sabemos que existe pero nunca lo hemos calculado de forma sistemática','Lo calculamos ocasionalmente pero no como proceso semanal establecido','El PPC se calcula automáticamente cada semana y se revisa el lunes en la reunión de obra']},{text:'¿Tienen un proceso de lookahead (3-6 semanas) para identificar y remover restricciones?',opts:['No tenemos lookahead — reaccionamos a los problemas cuando aparecen en campo','El residente piensa en lo que viene pero no hay un proceso formal documentado','Hacemos un lookahead informal de 2 semanas en las reuniones de coordinación','Lookahead formal de 6 semanas con identificación y responsable por cada restricción']},{text:'¿Documentan y analizan las causas raíz de los compromisos incumplidos semanalmente?',opts:['No documentamos por qué se incumplieron los compromisos de la semana anterior','Comentamos verbalmente en reunión las razones pero no queda registro estructurado','Llevamos un log de causas de incumplimiento pero sin análisis sistemático de patrones','Registro de causas raíz que se analiza mensualmente para mejorar la planificación futura']}]},
+  {id:'riesgos',label:'Gestión de riesgos',questions:[{text:'¿Tienen un registro formal de riesgos por proyecto, actualizado durante la ejecución?',opts:['No llevamos un registro de riesgos — los manejamos reactivamente cuando ocurren','Identificamos riesgos al inicio pero no los actualizamos ni hacemos seguimiento formal','Existe un registro pero se actualiza solo cuando ocurre un evento significativo','Registro de riesgos actualizado mensualmente con responsables asignados por riesgo']},{text:'¿Analizan la probabilidad e impacto de cada riesgo identificado usando matrices formales?',opts:['No analizamos probabilidad ni impacto — todo es criterio del director de proyecto','Clasificamos los riesgos informalmente como alto/medio/bajo sin metodología definida','Usamos matrices de probabilidad e impacto ocasionalmente para los proyectos más grandes','Análisis cualitativo con matrices P×I como parte del proceso estándar en todos los proyectos']},{text:'¿Cuantifican el impacto de los riesgos en la fecha de término o el costo final del proyecto?',opts:['No cuantificamos el impacto monetario ni en plazo de los riesgos identificados','Hacemos estimaciones informales del impacto sin metodología probabilística','Calculamos un colchón de contingencia global sin asociarlo a riesgos específicos','Análisis cuantitativo que da rango probabilístico de costo y fecha de término']},{text:'¿Tienen planes de respuesta — mitigación, contingencia — para los riesgos críticos?',opts:['No tenemos planes de respuesta — actuamos según criterio cuando el riesgo ocurre','Pensamos en respuestas pero no están documentadas ni asignadas a un responsable','Planes de respuesta documentados para los riesgos de mayor impacto en el proyecto','Planes pre y post-mitigación integrados al cronograma con actividades y responsables']}]},
+  {id:'recursos',label:'Gestión de recursos',questions:[{text:'¿Cómo planifican y controlan la mano de obra y equipos por actividad en sus proyectos?',opts:['Sin planificación formal de recursos — se asigna según disponibilidad en el momento','Planificamos recursos al inicio pero no hacemos seguimiento del rendimiento real vs plan','Controlamos la asignación de recursos semanalmente con ajuste manual al cronograma','Asignación de recursos por actividad en el cronograma con histogramas de carga actualizados']},{text:'¿Tienen visibilidad de la capacidad de recursos disponibles en todos sus proyectos activos?',opts:['No — cada gerente de obra gestiona sus recursos de forma independiente y aislada','Coordinamos informalmente por teléfono cuando hay un conflicto de recursos','Revisión mensual manual de disponibilidad de recursos en la reunión de gerencia','Dashboard de capacidad multi-proyecto con sobre-asignación y disponibilidad en tiempo real']},{text:'¿Realizan nivelación de recursos para evitar sobrecargas en períodos críticos de la obra?',opts:['No hacemos nivelación formal — el equipo trabaja más horas cuando hay sobrecarga','El director ajusta intuitivamente los cronogramas cuando ve conflicto de recursos','Hacemos nivelación manual ocasionalmente para los recursos más críticos del proyecto','Nivelación automática de recursos multi-proyecto con análisis de capacidad y curvas de carga']}]},
+  {id:'portafolio',label:'Portafolio y reportes',questions:[{text:'¿Tiene el directorio una vista consolidada en tiempo real del estado de todos los proyectos?',opts:['No existe — cada gerente tiene sus propios archivos sin ninguna vista consolidada','Existe un Excel de portafolio que alguien actualiza manualmente cada mes','Existe en el ERP pero los datos no siempre reflejan la realidad actual del campo','Dashboard automático multi-proyecto actualizado con datos del campo, sin trabajo manual']},{text:'¿Realizan análisis de escenarios (what-if) sobre costo, cronograma o recursos a nivel portafolio?',opts:['No hacemos análisis de escenarios — trabajamos con el plan aprobado hasta que cambia','Hacemos ejercicios informales de "qué pasaría si..." sin herramienta ni metodología','Modelamos 1 o 2 escenarios alternativos manualmente cuando hay una decisión crítica','Planificación de escenarios integrada: cambiamos supuestos y el sistema recalcula impactos']},{text:'¿Tienen KPIs de desempeño definidos y visibles a nivel portafolio para la alta gerencia?',opts:['No hay KPIs formales de portafolio — las decisiones se basan en criterio del directorio','Tenemos algunos KPIs pero se calculan manualmente y llegan al directorio con retraso','KPIs definidos que se preparan mensualmente con datos del sistema existente','KPIs de portafolio calculados automáticamente y disponibles en dashboard ejecutivo en tiempo real']},{text:'¿Cuánto tiempo toma preparar el informe semanal de avance de obra para el directorio?',opts:['No existe informe semanal — la información se da verbalmente cuando se pide','Más de 4 horas entre consolidar datos, redactar el documento y preparar presentaciones','Entre 1 y 4 horas si los datos ya están disponibles en el sistema de la empresa','Menos de 30 minutos o se genera completamente automático sin intervención del equipo']}]},
+  {id:'comunicacion',label:'Comunicación y actas',questions:[{text:'¿Cómo gestionan las actas de las reuniones de coordinación y obra actualmente?',opts:['No se hacen actas — o se hacen de forma muy ocasional e informal sin estructura','Alguien toma notas y las pasa a Word o correo, proceso que tarda 1 a 2 días','Hay un formato estándar que se completa manualmente después de cada reunión','Transcripción automática y acta estructurada generada en menos de 30 minutos con IA']},{text:'¿El equipo de campo y el equipo de oficina trabajan sobre el mismo cronograma en tiempo real?',opts:['No — campo trabaja con copias físicas o impresiones; oficina actualiza su propio archivo','Enviamos el cronograma actualizado por email o WhatsApp cuando hay cambios importantes','El residente tiene acceso al sistema pero lo actualiza con demora, no en tiempo real','Sincronización instantánea campo-oficina — el residente actualiza desde móvil inmediatamente']},{text:'¿Cómo hacen seguimiento formal a los compromisos acordados en las reuniones de obra?',opts:['No hay seguimiento formal — los acuerdos quedan en la memoria de los participantes','Alguien revisa el correo o chat donde se mandó el acta de la reunión anterior','Lista en Excel o Notion que alguien mantiene actualizada cuando tiene tiempo','Sistema que notifica automáticamente al responsable antes del vencimiento de su compromiso']}]},
+  {id:'herramientas',label:'Herramientas y adopción',questions:[{text:'¿Qué herramientas digitales usa actualmente el equipo de proyectos para la gestión de obra?',opts:['Principalmente WhatsApp y Excel para absolutamente todo el control del proyecto','WhatsApp, Excel y algún software básico de presupuesto o contabilidad de proyectos','ERP o software de gestión de proyectos, pero sin integración real con el campo','Suite integrada donde los datos del campo llegan automáticamente al sistema del directorio']},{text:'¿Usan aplicación móvil para que el equipo de campo actualice avance offline desde la obra?',opts:['No — toda actualización de campo pasa por llamada o mensaje y alguien la carga después','El residente usa el celular para fotos o notas pero no hay app conectada al sistema central','Usamos formularios digitales (Google Forms, etc.) pero sin sincronización automática','App móvil nativa que funciona offline y sincroniza automáticamente al reconectarse al sistema']},{text:'¿Pueden varios miembros del equipo trabajar simultáneamente sobre el mismo cronograma?',opts:['No — solo una persona puede editar el archivo del cronograma a la vez (Excel/P6 local)','Compartimos el archivo en la nube pero si dos personas editan a la vez hay conflictos','Diferentes personas gestionan diferentes partes del cronograma con coordinación manual','Multi-usuario simultáneo sobre el mismo cronograma con discusiones y notificaciones integradas']},{text:'¿Cuánto tiempo tarda su equipo en adoptar efectivamente una herramienta nueva de gestión?',opts:['Nunca las adoptan realmente — siempre vuelven al WhatsApp y el Excel conocidos','Entre 6 y 12 meses con resistencia significativa del equipo de campo y de obra','Entre 3 y 6 meses con capacitación intensiva, seguimiento y presión de la gerencia','Menos de 3 meses si la herramienta es práctica, intuitiva y resuelve un dolor real']}]},
+];
+
+const SK='sinergia_evaluaciones';
+function sg(k){try{const v=localStorage.getItem(k);return v?JSON.parse(v):null;}catch{return null;}}
+function ss(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true;}catch{return false;}}
+function showToast(msg){const t=document.getElementById('toast');if(!t)return;t.className='toast show';t.textContent=msg;setTimeout(()=>t.classList.remove('show'),3800);}
+function statusFor(pct){
+  if(pct<35)return{label:'Crítico',color:'#DC2626',bg:'#FEE2E2'};
+  if(pct<55)return{label:'Deficiente',color:'#D97706',bg:'#FEF3C7'};
+  if(pct<70)return{label:'En desarrollo',color:'#0D9488',bg:'#CCFBF1'};
+  if(pct<85)return{label:'Maduro',color:'#1E40AF',bg:'#DBEAFE'};
+  return{label:'Optimizado',color:'#064E3B',bg:'#D1FAE5'};
+}
+function fmtDate(iso){try{const d=new Date(iso);return d.toLocaleDateString('es-EC',{day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});}catch{return iso;}}
+
+function render(){
+  const evs=sg(SK)||[];
+  const main=document.getElementById('main');
+  if(evs.length===0){
+    main.innerHTML=`<div class="anim" style="text-align:center;padding:60px 22px;color:#64748B">
+      <div style="font-size:46px;margin-bottom:14px">📋</div>
+      <div style="font-family:'DM Serif Display',Georgia,serif;font-size:23px;color:#0F172A;margin-bottom:7px">Aún no hay diagnósticos guardados</div>
+      <div style="font-size:14px;line-height:1.5;margin-bottom:22px">Complete el diagnóstico de madurez y los resultados se guardarán automáticamente aquí para que pueda consultarlos cuando quiera y comparar evolución entre evaluaciones.</div>
+      <a href="SinergIA_Diagnostico.html" class="btn btn-primary" style="font-size:15px;padding:12px 24px">Iniciar primer diagnóstico →</a>
+    </div>`;
+    return;
+  }
+  main.innerHTML=`<div class="anim">
+<div class="h-hero">
+  <div class="hh-eye">SinergIA · Historial de evaluaciones</div>
+  <h1 class="hh-title">${evs.length} diagnóstico${evs.length>1?'s':''} guardado${evs.length>1?'s':''}</h1>
+  <p class="hh-sub">Todos sus diagnósticos de madurez digital en gestión de proyectos y construcción. Los resultados más recientes aparecen primero.</p>
+</div>
+<div class="meta-bar">
+  <div class="meta-cnt">${evs.length} evaluación${evs.length>1?'es':''} — más reciente primero</div>
+  <div class="meta-acts">
+    <a href="SinergIA_Diagnostico.html" class="btn btn-primary btn-sm">+ Nuevo</a>
+    <button class="btn btn-ghost btn-sm" onclick="exportAll()">Exportar todo (.txt)</button>
+    <button class="btn btn-red btn-sm" onclick="clearAll()">Borrar todo</button>
+  </div>
+</div>
+<div id="ev-list">
+${evs.map((ev,idx)=>renderCard(ev,idx)).join('')}
+</div>
+</div>`;
+  setTimeout(()=>document.querySelectorAll('.ebs-bf[data-w]').forEach(el=>el.style.width=el.dataset.w+'%'),120);
+}
+
+function renderCard(ev,idx){
+  const st=statusFor(ev.total);
+  const meta=[ev.sector,ev.tamanio,ev.proyectos].filter(Boolean).join(' · ');
+  const puntajes=ev.puntajes||[];
+  const roadmap=ev.roadmap||[];
+  const answers=buildAnswersHTML(ev);
+  return`<div class="ev-card" id="ec-${idx}">
+  <div class="ev-head" onclick="toggleCard(${idx})">
+    <div class="eh-score"><div class="es-n" style="color:${st.color}">${ev.total}</div><div class="es-l" style="color:${st.color}">${ev.etiqueta}</div></div>
+    <div><div class="ei-co">${ev.empresa}</div><div class="ei-meta">${fmtDate(ev.fecha)}${ev.contacto?' · '+ev.contacto:''}${meta?' · '+meta:''}</div></div>
+    <div class="eh-acts">
+      <button class="btn btn-ghost btn-sm" onclick="printEval(${idx},event)">Imprimir</button>
+      <button class="btn btn-ghost btn-sm" onclick="copyEval(${idx},event)">Copiar</button>
+      <button class="btn btn-red btn-sm" onclick="deleteEval(${idx},event)">Borrar</button>
+      <button class="ev-toggle" onclick="toggleCard(${idx});event.stopPropagation()">▾</button>
+    </div>
+  </div>
+  <div class="ev-body">
+    <div style="font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:.1em;margin-bottom:9px">Resultados por área</div>
+    <div class="eb-sg">
+      ${puntajes.map(p=>{const ps=statusFor(p.pct);return`<div class="ebs"><div class="ebs-l">${p.label}</div><div class="ebs-p" style="color:${ps.color}">${p.pct}%</div><div class="ebs-bar"><div class="ebs-bf" style="width:0%;background:${ps.color};transition:width 1s" data-w="${p.pct}"></div></div><div class="ebs-s" style="color:${ps.color}">${ps.label} · ${p.weight}%</div></div>`;}).join('')}
+    </div>
+    ${roadmap.length>0?`<div class="eb-rm-title">Roadmap propuesto</div><div class="eb-rm-grid">${roadmap.map((rm,i)=>`<div class="rm-it ${i===0?'f':''}"><div class="rm-wk">Semanas ${i*3+1}–${i*3+3}</div><div class="rm-nm">${rm.name}</div><span class="rm-h">${rm.hrs}</span></div>`).join('')}</div>`:''}
+    <button class="ans-btn" id="ab-${idx}" onclick="toggleAnswers(${idx})">Ver respuestas detalladas ▾</button>
+    <div class="ans-box" id="ans-${idx}">${answers}</div>
+  </div>
+</div>`;
+}
+
+function buildAnswersHTML(ev){
+  if(!ev.respuestas||!SECTIONS)return'<p style="font-size:13px;color:#64748B">Sin detalle disponible.</p>';
+  let h='';
+  SECTIONS.forEach((sec,si)=>{
+    h+=`<div class="ans-sec"><div class="ans-st">${sec.label}</div>`;
+    sec.questions.forEach((q,qi)=>{
+      const score=ev.respuestas[si+'_'+qi];
+      if(score!==undefined){const opt=q.opts[score-1]||'—';h+=`<div class="ans-q">P${qi+1}: ${q.text.substring(0,80)}${q.text.length>80?'...':''}</div><div class="ans-a">→ ${opt}</div>`;}
+    });
+    h+=`</div>`;
+  });
+  return h||'<p style="font-size:13px;color:#64748B">Sin detalle disponible.</p>';
+}
+
+function toggleCard(idx){
+  const card=document.getElementById('ec-'+idx);if(!card)return;
+  const wasOpen=card.classList.contains('open');
+  document.querySelectorAll('.ev-card.open').forEach(c=>c.classList.remove('open'));
+  if(!wasOpen){card.classList.add('open');setTimeout(()=>{card.querySelectorAll('.ebs-bf[data-w]').forEach(el=>el.style.width=el.dataset.w+'%');},60);}
+}
+function toggleAnswers(idx){
+  const box=document.getElementById('ans-'+idx);const btn=document.getElementById('ab-'+idx);if(!box)return;
+  const isOpen=box.classList.toggle('open');btn.textContent=isOpen?'Ocultar respuestas ▲':'Ver respuestas detalladas ▾';
+}
+function deleteEval(idx,e){
+  e.stopPropagation();
+  const evs=sg(SK)||[];
+  if(!confirm(`¿Eliminar el diagnóstico de "${evs[idx]?.empresa||'esta evaluación'}"?\nEsta acción no se puede deshacer.`))return;
+  evs.splice(idx,1);ss(SK,evs);showToast('Evaluación eliminada');render();
+}
+function clearAll(){
+  const evs=sg(SK)||[];if(!evs.length)return;
+  if(!confirm(`¿Eliminar los ${evs.length} diagnósticos guardados?\nEsta acción no se puede deshacer.`))return;
+  localStorage.removeItem(SK);showToast('Historial eliminado');render();
+}
+function copyEval(idx,e){
+  e.stopPropagation();
+  const evs=sg(SK)||[];const ev=evs[idx];if(!ev)return;
+  const p=ev.puntajes||[];const rm=ev.roadmap||[];
+  let t=`DIAGNÓSTICO DE MADUREZ — ${ev.empresa}\nFecha: ${fmtDate(ev.fecha)} | Puntaje: ${ev.total}/100 — ${ev.etiqueta}\n${ev.sector?'Sector: '+ev.sector+'\n':''}\nRESULTADOS:\n`;
+  p.forEach(pt=>{t+=`· ${pt.label}: ${pt.pct}% — ${statusFor(pt.pct).label}\n`;});
+  if(rm.length>0){t+=`\nROADMAP:\n`;rm.forEach((r,i)=>{t+=`${i+1}. ${r.name} — ${r.hrs}\n`;});}
+  t+=`\nSinergIA by Human+AI · 2026`;
+  navigator.clipboard.writeText(t).then(()=>showToast('✓ Resumen copiado')).catch(()=>alert('No se pudo copiar automáticamente.'));
+}
+function printEval(idx,e){
+  e.stopPropagation();
+  const evs=sg(SK)||[];const ev=evs[idx];if(!ev)return;
+  const st=statusFor(ev.total);const p=ev.puntajes||[];const rm=ev.roadmap||[];
+  const win=window.open('','_blank');
+  if(!win){alert('Permita ventanas emergentes para imprimir.');return;}
+  win.document.write(`<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><title>Diagnóstico ${ev.empresa} — SinergIA</title><style>body{font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:28px;color:#0F172A;font-size:13px;line-height:1.5}h1{font-size:26px;color:#064E3B;margin-bottom:3px}.meta{color:#64748B;font-size:12px;margin-bottom:20px}.score-n{font-size:44px;font-weight:700;color:${st.color};line-height:1}.score-l{font-size:13px;font-weight:600;color:${st.color};text-transform:uppercase;letter-spacing:.07em;margin-bottom:20px}.sh{font-size:15px;font-weight:600;color:#064E3B;margin-top:20px;margin-bottom:8px;padding-bottom:5px;border-bottom:2px solid #D1FAE5}.ag{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:16px}.ac{border:1px solid #E2E8F0;border-radius:7px;padding:9px 11px}.al{font-size:11px;font-weight:500;color:#0F172A;margin-bottom:2px}.ap{font-size:19px;font-weight:700}.as{font-size:10px}.rg{display:grid;grid-template-columns:1fr 1fr;gap:7px}.ri{border:1px solid #E2E8F0;border-radius:7px;padding:9px 11px}.ri.f{border-color:#064E3B;border-width:2px}.rw{font-size:10px;color:#64748B;text-transform:uppercase}.rn{font-size:12px;font-weight:600;color:#0F172A}.ri.f .rn{color:#064E3B}.rh{font-size:11px;font-weight:600;color:#064E3B;background:#D1FAE5;padding:2px 7px;border-radius:4px;display:inline-block;margin-top:3px}footer{margin-top:32px;font-size:10px;color:#94A3B8;border-top:1px solid #E2E8F0;padding-top:10px}</style></head><body><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px"><div><h1>${ev.empresa}</h1><div class="meta">${fmtDate(ev.fecha)}${ev.contacto?' · '+ev.contacto:''}${ev.sector?' · '+ev.sector:''}</div></div><div style="text-align:right"><div class="score-n">${ev.total}</div><div class="score-l">${ev.etiqueta}</div></div></div><div class="sh">Resultados por área</div><div class="ag">${p.map(pt=>{const ps=statusFor(pt.pct);return`<div class="ac"><div class="al">${pt.label} · ${pt.weight}%</div><div class="ap" style="color:${ps.color}">${pt.pct}%</div><div class="as" style="color:${ps.color}">${ps.label}</div></div>`;}).join('')}</div>${rm.length>0?`<div class="sh">Roadmap propuesto de Sprints SinergIA</div><div class="rg">${rm.map((r,i)=>`<div class="ri ${i===0?'f':''}"><div class="rw">Semanas ${i*3+1}–${i*3+3}</div><div class="rn">${r.name}</div><span class="rh">${r.hrs} recuperadas</span></div>`).join('')}</div>`:''}<footer>SinergIA by Human+AI · IA que multiplica, no reemplaza · Diagnóstico generado el ${fmtDate(ev.fecha)}</footer></body></html>`);
+  win.document.close();win.focus();setTimeout(()=>win.print(),500);
+}
+function exportAll(){
+  const evs=sg(SK)||[];if(!evs.length){showToast('No hay evaluaciones para exportar');return;}
+  let t=`HISTORIAL DE DIAGNÓSTICOS — SinergIA\nExportado: ${new Date().toLocaleDateString('es-EC')}\nTotal: ${evs.length} evaluación${evs.length>1?'es':''}\n\n${'='.repeat(60)}\n\n`;
+  evs.forEach((ev,i)=>{
+    const p=ev.puntajes||[];const rm=ev.roadmap||[];
+    t+=`EVALUACIÓN ${i+1}: ${ev.empresa}\nFecha: ${fmtDate(ev.fecha)} | Puntaje: ${ev.total}/100 — ${ev.etiqueta}\n${ev.contacto?'Evaluador: '+ev.contacto+'\n':''}${ev.sector?'Sector: '+ev.sector+'\n':''}\nPuntajes:\n`;
+    p.forEach(pt=>{t+=`  · ${pt.label}: ${pt.pct}% — ${statusFor(pt.pct).label}\n`;});
+    if(rm.length>0){t+=`\nRoadmap:\n`;rm.forEach((r,j)=>{t+=`  ${j+1}. ${r.name} — ${r.hrs}\n`;});}
+    t+='\n'+'-'.repeat(60)+'\n\n';
+  });
+  t+='SinergIA by Human+AI · IA que multiplica, no reemplaza · 2026';
+  const blob=new Blob([t],{type:'text/plain;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=`SinergIA_Historial_${new Date().toISOString().split('T')[0]}.txt`;a.click();URL.revokeObjectURL(url);
+  showToast('✓ Archivo descargado');
+}
+
+render();
+</script>
+</body>
+</html>
